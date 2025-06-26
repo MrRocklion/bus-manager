@@ -1,6 +1,6 @@
 import models, schemas, operations as crud
 import asyncio
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends,Query
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends,Query,HTTPException, status
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine
 from datetime import datetime
@@ -20,6 +20,13 @@ def get_db():
 def create_passenger(passenger: schemas.PassengerCreate, db: Session = Depends(get_db)):
     return crud.create_passenger(db, passenger)
 
+@app.delete("/api/passengers", response_model=schemas.Message)
+def reset_passengers_history(db: Session = Depends(get_db)):
+    try:
+        deleted = crud.reset_count(db)
+        return {"message": f"{deleted} passengers deleted."}
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 @app.get("/api/passengers/", response_model=list[schemas.Passenger])
 def read_all_passengers(db: Session = Depends(get_db)):

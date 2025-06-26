@@ -20,6 +20,12 @@ def create_passenger(db: Session, passenger: schemas.PassengerCreate):
 def get_all_passengers(db: Session):
     return db.query(models.Passenger).all()
 
+def reset_count(db: Session):
+    deleted = db.query(models.Passenger).delete()
+    db.commit()
+    return deleted
+
+
 def get_passengers_today(db: Session) -> List[Passenger]:
     today = date.today()
     return db.query(Passenger).filter(

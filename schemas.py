@@ -15,3 +15,6 @@ class Passenger(PassengerBase):
     model_config = {
         "from_attributes": True
     }
+
+class Message(BaseModel):
+    message: str
