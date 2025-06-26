@@ -16,7 +16,7 @@ def get_db():
     finally:
         db.close()
 
-@app.post("/api/passengers/", response_model=schemas.Passenger)
+@app.post("/api/passengers", response_model=schemas.Passenger)
 def create_passenger(passenger: schemas.PassengerCreate, db: Session = Depends(get_db)):
     return crud.create_passenger(db, passenger)
 
@@ -28,7 +28,7 @@ def reset_passengers_history(db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
-@app.get("/api/passengers/", response_model=list[schemas.Passenger])
+@app.get("/api/passengers", response_model=list[schemas.Passenger])
 def read_all_passengers(db: Session = Depends(get_db)):
     return crud.get_all_passengers(db)
 

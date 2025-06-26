@@ -1,5 +1,5 @@
 sudo nano /etc/systemd/system/bus_manager_backend.service
-
+uvicorn main:app --host 0.0.0.0 --port 8000
 
 [Unit]
 Description=FastAPI App
