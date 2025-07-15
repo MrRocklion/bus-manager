@@ -56,7 +56,7 @@ def read_passengers_in_range(
     return crud.get_passengers_in_range(db, start_datetime, end_datetime)
 
 
-@app.get("api/transactions/by_date", response_model=list[schemas.Transaction])
+@app.get("/api/transactions/by_date", response_model=list[schemas.Transaction])
 def get_transactions_by_dates(
         start_datetime: datetime = Query(..., description="Fecha y hora de inicio"),
         end_datetime: datetime = Query(..., description="Fecha y hora de fin"),
