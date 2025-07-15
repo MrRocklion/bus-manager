@@ -20,6 +20,16 @@ def get_db():
 def create_passenger(passenger: schemas.PassengerCreate, db: Session = Depends(get_db)):
     return crud.create_passenger(db, passenger)
 
+@app.post("/api/transactions", response_model=schemas.MessageResponseTransaction)
+def create_transaction(tx_data: schemas.TransactionCreate, db: Session = Depends(get_db)):
+    result = crud.create_transaction(db, tx_data)
+    return {
+        "message": "Transaction created successfully",
+        "status": 200,
+        "result": result
+    }
+
+
 @app.delete("/api/passengers", response_model=schemas.Message)
 def reset_passengers_history(db: Session = Depends(get_db)):
     try:
@@ -45,12 +55,22 @@ def read_passengers_in_range(
 ):
     return crud.get_passengers_in_range(db, start_datetime, end_datetime)
 
+
+@app.get("api/transactions/by_date", response_model=list[schemas.Transaction])
+def get_transactions_by_dates(
+        start_datetime: datetime = Query(..., description="Fecha y hora de inicio"),
+        end_datetime: datetime = Query(..., description="Fecha y hora de fin"),
+        db: Session = Depends(get_db)
+    ):
+    return crud.get_transactions_in_range(db, start_datetime, end_datetime)
+
+
+
 @app.websocket("/ws/passenger-count")
 async def websocket_passenger_count(websocket: WebSocket):
     await websocket.accept()
     try:
         while True:
-            # Nueva sesión DB por loop
             db = SessionLocal()
             try:
                 count = crud.count_passengers_today(db)
@@ -58,6 +78,6 @@ async def websocket_passenger_count(websocket: WebSocket):
             finally:
                 db.close()
 
-            await asyncio.sleep(2)  # cada 2 segundos (ajustable)
+            await asyncio.sleep(0.5)  # cada 2 segundos (ajustable)
     except WebSocketDisconnect:
         print("Cliente desconectado del stream.")

@@ -16,6 +16,23 @@ def create_passenger(db: Session, passenger: schemas.PassengerCreate):
     db.refresh(db_passenger)
     return db_passenger
 
+def create_transaction(db: Session, tx_data: schemas.TransactionCreate):
+    ecu_time = datetime.now(pytz.timezone("America/Guayaquil")).replace(microsecond=0)
+
+    tx = models.Transaction(
+        card_code=tx_data.card_code,
+        card_type=tx_data.card_type,
+        date=tx_data.date,
+        time=tx_data.time,
+        amount=tx_data.amount,
+        balance=tx_data.balance,
+        last_balance=tx_data.last_balance,
+        timestamp=ecu_time,
+    )
+    db.add(tx)
+    db.commit()
+    db.refresh(tx)
+    return tx
 
 def get_all_passengers(db: Session):
     return db.query(models.Passenger).all()
@@ -40,10 +57,14 @@ def count_passengers_today(db: Session) -> int:
         Passenger.datetime <= datetime.combine(today, datetime.max.time())
     ).count()
 
-def get_passengers_in_range(
-    db: Session, start_datetime: datetime, end_datetime: datetime
-) -> List[Passenger]:
+def get_passengers_in_range(db: Session, start_datetime: datetime, end_datetime: datetime) -> List[Passenger]:
     return db.query(Passenger).filter(
         Passenger.datetime >= start_datetime,
         Passenger.datetime <= end_datetime
+    ).all()
+
+def get_transactions_in_range(db: Session, start_datetime: datetime, end_datetime: datetime) -> List[models.Transaction]:
+    return db.query(models.Transaction).filter(
+        models.Transaction.timestamp >= start_datetime,
+        models.Transaction.timestamp <= end_datetime
     ).all()
