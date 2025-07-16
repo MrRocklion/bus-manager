@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, DateTime, Boolean,String,Numeric
+from sqlalchemy import Column, Integer, DateTime, Boolean,String,Numeric,Float,JSON
 from sqlalchemy.sql import func
 from database import Base
 
@@ -21,4 +21,11 @@ class Transaction(Base):
     last_balance = Column(Numeric,index=True,nullable=False)
     timestamp = Column(DateTime, index=True)
     uploaded = Column(Boolean, default=False, index=True)
-    
+
+class CounterConfig(Base):
+    __tablename__ = "counter_config"
+    id = Column(Integer, primary_key=True, index=True)
+    cross_line_y = Column(Integer, unique=True, nullable=False)
+    excluded_areas = Column(JSON, nullable=True)
+    track_threshold = Column(Float, nullable=False, default=0.40)
+    track_buffer = Column(Integer, nullable=False, default=70)
