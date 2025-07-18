@@ -81,6 +81,26 @@ class MessageResponseListTransaction(BaseModel):
     }
 
 
+class TransactionFormatted(BaseModel):
+    id: int
+    card_code: str
+    card_type: int
+    date: str
+    time: str
+    amount: float
+    balance: float
+    last_balance: float
+    timestamp: str
+
+class TransactionListResponse(BaseModel):
+    message: str
+    status: int
+    result: List[TransactionFormatted]
+
+    model_config = {
+        "from_attributes": True
+    }
+
 class MessageResponseDict(BaseModel):
     message: str
     status: int

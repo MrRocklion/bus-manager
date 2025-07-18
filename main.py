@@ -4,7 +4,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends,Query,HTTPE
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine
 from datetime import datetime
-
+from typing import List
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
@@ -113,21 +113,38 @@ def read_passengers_in_range(
     }
 
 
-
-@app.get("/api/transactions/by_date", response_model=schemas.MessageResponseListTransaction)
+@app.get("/api/transactions/by_date",response_model=schemas.TransactionListResponse)
 def get_transactions_by_dates(
-        start_datetime: datetime = Query(..., description="Fecha y hora de inicio"),
-        end_datetime: datetime = Query(..., description="Fecha y hora de fin"),
-        db: Session = Depends(get_db)
-    ):
-    result = crud.get_transactions_in_range(db, start_datetime, end_datetime)
-    if not result:
-        raise HTTPException(status_code=404, detail="No transactions found in the specified range.")
+    start_datetime: datetime = Query(..., description="Fecha y hora de inicio"),
+    end_datetime:   datetime = Query(..., description="Fecha y hora de fin"),
+    db: Session = Depends(get_db)
+):
+    txs: List = crud.get_transactions_in_range(db, start_datetime, end_datetime)
+    if not txs:
+        raise HTTPException(
+            status_code=404,
+            detail="No transactions found in the specified range."
+        )
+    formatted: List[dict] = []
+    for tx in txs:
+        formatted.append({
+            "id":            tx.id,
+            "card_code":     tx.card_code,
+            "card_type":     int(tx.card_type) if isinstance(tx.card_type, str) else tx.card_type,
+            "date":          tx.date,
+            "time":          tx.time,
+            "amount":        float(tx.amount),
+            "balance":       float(tx.balance),
+            "last_balance":  float(tx.last_balance),
+            "timestamp":     tx.timestamp.isoformat(),
+        })
+
     return {
         "message": "Transactions retrieved successfully",
-        "status": 200,
-        "result": result
+        "status":  200,
+        "result":  formatted
     }
+
 
 
 
