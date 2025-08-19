@@ -195,18 +195,24 @@ def get_last_counter_config(db: Session = Depends(get_db)):
 
 
 
-@app.websocket("/ws/passenger-count")
-async def websocket_passenger_count(websocket: WebSocket):
+@app.websocket("/ws/metrics")
+async def websocket_metrics(websocket: WebSocket):
     await websocket.accept()
     try:
         while True:
             db = SessionLocal()
             try:
                 count = crud.count_passengers_today(db)
-                await websocket.send_json({"count": count})
+                tx_count = crud.count_transactions_today(db)
+                tx_pending = crud.count_transactions_pending(db)
+                await websocket.send_json({
+                    "passengers_today": count,
+                    "transactions_today": tx_count,
+                    "pending_transactions":tx_pending
+                })
             finally:
                 db.close()
 
-            await asyncio.sleep(0.5)  # cada 2 segundos (ajustable)
+            await asyncio.sleep(0.5)
     except WebSocketDisconnect:
         print("Cliente desconectado del stream.")

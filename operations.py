@@ -36,12 +36,19 @@ def create_transaction(db: Session, tx_data: schemas.TransactionCreate):
     return tx
 
 def create_counter_config(db: Session, config_data: schemas.CounterConfigCreate):
+    ecu_time = datetime.now(pytz.timezone("America/Guayaquil")).replace(microsecond=0)
     excluded_areas = jsonable_encoder(config_data.excluded_areas)
     config = models.CounterConfig(
         cross_line_y=config_data.cross_line_y,
         excluded_areas=excluded_areas,
         track_threshold=config_data.track_threshold,
-        track_buffer=config_data.track_buffer
+        track_buffer=config_data.track_buffer,
+        timestamp=ecu_time,
+        ip_counter_camera=config_data.ip_counter_camera,
+        ip_back_camera=config_data.ip_back_camera,
+        ip_front_camera=config_data.ip_front_camera,
+        user_camera=config_data.user_camera,
+        password_camera=config_data.password_camera,
     )
     db.add(config)
     db.commit()
@@ -81,6 +88,18 @@ def count_passengers_today(db: Session) -> int:
     return db.query(Passenger).filter(
         Passenger.datetime >= datetime.combine(today, datetime.min.time()),
         Passenger.datetime <= datetime.combine(today, datetime.max.time())
+    ).count()
+
+def count_transactions_today(db: Session) -> int:
+    today = date.today()
+    return db.query(models.Transaction).filter(
+        models.Transaction.timestamp >= datetime.combine(today, datetime.min.time()),
+        models.Transaction.timestamp <= datetime.combine(today, datetime.max.time())
+    ).count()
+
+def count_transactions_pending(db: Session) -> int:
+    return db.query(models.Transaction).filter(
+        models.Transaction.uploaded == False
     ).count()
 
 def get_passengers_in_range(db: Session, start_datetime: datetime, end_datetime: datetime) -> List[Passenger]:

@@ -117,6 +117,11 @@ class CounterConfigBase(BaseModel):
     excluded_areas: Optional[List[List[Point]]] = None
     track_threshold: float = 0.40
     track_buffer: int = 70
+    ip_counter_camera: str
+    ip_back_camera: str
+    ip_front_camera: str
+    user_camera: str
+    password_camera: str
 
 class CounterConfigCreate(CounterConfigBase):
     pass

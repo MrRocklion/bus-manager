@@ -25,7 +25,13 @@ class Transaction(Base):
 class CounterConfig(Base):
     __tablename__ = "counter_config"
     id = Column(Integer, primary_key=True, index=True)
-    cross_line_y = Column(Integer, unique=True, nullable=False)
+    cross_line_y = Column(Integer, nullable=False)
     excluded_areas = Column(JSON, nullable=True)
     track_threshold = Column(Float, nullable=False, default=0.40)
     track_buffer = Column(Integer, nullable=False, default=70)
+    timestamp = Column(DateTime, index=True, default=func.now())
+    ip_counter_camera = Column(String, nullable=False)
+    ip_back_camera = Column(String, nullable=False)
+    ip_front_camera = Column(String, nullable=False)
+    user_camera = Column(String, nullable=False)
+    password_camera = Column(String, nullable=False)
