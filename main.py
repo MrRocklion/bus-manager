@@ -1,7 +1,7 @@
 import models, schemas, operations as crud
 from fastapi.middleware.cors import CORSMiddleware
 import asyncio
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends,Query,HTTPException, status
+from fastapi import FastAPI,Path, WebSocket, WebSocketDisconnect, Depends,Query,HTTPException, status
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine
 from datetime import datetime
@@ -135,6 +135,32 @@ def read_passengers_in_range(
         "message": "Passengers in range retrieved successfully",
         "status": 200,
         "result": result
+    }
+
+
+@app.get("/api/passengers/by_date/uploaded", response_model=schemas.MessageResponseListPassenger)
+def read_passengers_in_range_upload(
+    start_datetime: datetime = Query(..., description="Fecha y hora de inicio"),
+    end_datetime: datetime = Query(..., description="Fecha y hora de fin"),
+    uploaded: bool = Query(...,description="obtener los datos cargados o aun no cargados"),
+    db: Session = Depends(get_db)
+):
+    result = crud.get_passengers_in_range_by_condition(db, start_datetime, end_datetime,uploaded)
+    return {
+        "message": "Passengers in range retrieved successfully",
+        "status": 200,
+        "result": result
+    }
+
+@app.patch("/api/passengers/{id_passenger}", response_model=schemas.MessageResponseDict)
+def update_passenger_upload_status(id_passenger: int = Path(..., gt=0),db: Session = Depends(get_db),):
+    result = crud.update_passenger(db, id_passenger)
+    if result is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Passenger not found")
+    return {
+        "message": "Passenger updated successfully",
+        "status": 200,
+        "result": {}
     }
 
 

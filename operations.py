@@ -108,6 +108,16 @@ def get_passengers_in_range(db: Session, start_datetime: datetime, end_datetime:
         Passenger.datetime <= end_datetime
     ).all()
 
+def update_passenger(db, id_passenger, uploaded=True):
+    passenger = db.get(Passenger, id_passenger)
+    if not passenger:
+        return None
+    passenger.uploaded = uploaded
+    db.add(passenger)
+    db.commit()
+    db.refresh(passenger)
+    return passenger
+
 def get_passengers_in_range_by_condition(db:Session,start_datetime: datetime, end_datetime: datetime,uploaded:bool) -> List[Passenger]:
     return db.query(Passenger).filter(
         Passenger.datetime >= start_datetime,
