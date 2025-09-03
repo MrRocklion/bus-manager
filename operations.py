@@ -108,6 +108,13 @@ def get_passengers_in_range(db: Session, start_datetime: datetime, end_datetime:
         Passenger.datetime <= end_datetime
     ).all()
 
+def get_passengers_in_range_by_condition(db:Session,start_datetime: datetime, end_datetime: datetime,uploaded:bool) -> List[Passenger]:
+    return db.query(Passenger).filter(
+        Passenger.datetime >= start_datetime,
+        Passenger.datetime <= end_datetime,
+        Passenger.uploaded == uploaded
+    ).all()
+
 def get_transactions_in_range(db: Session, start_datetime: datetime, end_datetime: datetime) -> List[models.Transaction]:
     return db.query(models.Transaction).filter(
         models.Transaction.timestamp >= start_datetime,

@@ -6,6 +6,7 @@ from typing import List, Any,Optional
 class PassengerBase(BaseModel):
     datetime: datetime
     special: bool
+    uploaded:bool
 
 class PassengerCreate(BaseModel):
     special: bool 

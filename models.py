@@ -8,6 +8,7 @@ class Passenger(Base):
     id = Column(Integer, primary_key=True, index=True)
     datetime = Column(DateTime, index=True, default=func.now()) 
     special = Column(Boolean, default=False, index=True)
+    uploaded = Column(Boolean, default=False, index=True)
 
 class Transaction(Base):
     __tablename__ = "transactions"

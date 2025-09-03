@@ -123,6 +123,20 @@ def read_passengers_in_range(
         "result": result
     }
 
+@app.get("/api/passengers/by_date/uploaded", response_model=schemas.MessageResponseListPassenger)
+def read_passengers_in_range(
+    start_datetime: datetime = Query(..., description="Fecha y hora de inicio"),
+    end_datetime: datetime = Query(..., description="Fecha y hora de fin"),
+    uploaded: bool = Query(...,description="obtener los datos cargados o aun no cargados"),
+    db: Session = Depends(get_db)
+):
+    result = crud.get_passengers_in_range_by_condition(db, start_datetime, end_datetime,uploaded)
+    return {
+        "message": "Passengers in range retrieved successfully",
+        "status": 200,
+        "result": result
+    }
+
 
 @app.get("/api/transactions/by_date",response_model=schemas.TransactionListResponse)
 def get_transactions_by_dates(
